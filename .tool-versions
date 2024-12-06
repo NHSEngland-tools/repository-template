@@ -3,6 +3,7 @@
 terraform 1.7.0
 pre-commit 3.6.0
 vale 3.6.0
+trivy 0.57.1
 
 # ==============================================================================
 # The section below is reserved for Docker image versions.
