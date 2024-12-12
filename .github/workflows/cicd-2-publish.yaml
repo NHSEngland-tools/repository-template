@@ -1,16 +1,17 @@
 name: "CI/CD publish"
 
 on:
-  pull_request:
-    types: [closed]
-    branches:
-      - main
+  push:
+    branches: [ "main" ]
+  # pull_request:
+  #   types: [closed]
+  #   branches: [ "main" ]
 
 jobs:
   metadata:
     name: "Set CI/CD metadata"
     runs-on: ubuntu-latest
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     timeout-minutes: 1
     outputs:
       build_datetime: ${{ steps.variables.outputs.build_datetime }}
@@ -19,7 +20,6 @@ jobs:
       nodejs_version: ${{ steps.variables.outputs.nodejs_version }}
       python_version: ${{ steps.variables.outputs.python_version }}
       terraform_version: ${{ steps.variables.outputs.terraform_version }}
-      version: ${{ steps.variables.outputs.version }}
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -33,8 +33,6 @@ jobs:
           echo "nodejs_version=$(grep "^nodejs" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
           echo "python_version=$(grep "^nodejs" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
           echo "terraform_version=$(grep "^terraform" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
-          # TODO: Get the version, but it may not be the .version file as this should come from the CI/CD Pull Request Workflow
-          echo "version=$(head -n 1 .version 2> /dev/null || echo unknown)" >> $GITHUB_OUTPUT
       - name: "List variables"
         run: |
           export BUILD_DATETIME="${{ steps.variables.outputs.build_datetime }}"
@@ -43,14 +41,15 @@ jobs:
           export NODEJS_VERSION="${{ steps.variables.outputs.nodejs_version }}"
           export PYTHON_VERSION="${{ steps.variables.outputs.python_version }}"
           export TERRAFORM_VERSION="${{ steps.variables.outputs.terraform_version }}"
-          export VERSION="${{ steps.variables.outputs.version }}"
           make list-variables
   publish:
     name: "Publish packages"
     runs-on: ubuntu-latest
     needs: [metadata]
-    if: github.event.pull_request.merged == true
+    # if: github.event.pull_request.merged == true
     timeout-minutes: 3
+    outputs:
+      version: ${{ steps.semantic.outputs.new_release_version }}
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v4
@@ -58,27 +57,22 @@ jobs:
         run: |
           echo "Getting the artefacts created by the build stage ..."
           # TODO: Use either action/cache or action/upload-artifact
-      - name: "Create release"
-        id: create_release
-        uses: actions/create-release@v1
+      - name: "Semantic Release"
+        uses: cycjimmy/semantic-release-action@v4.1.0
+        id: semantic
+        with:
+          dry_run: ${{github.event_name == 'pull_request'}}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ needs.metadata.outputs.version }}
-          release_name: Release ${{ needs.metadata.outputs.version }}
-          body: |
-            Release of ${{ needs.metadata.outputs.version }}
-          draft: false
-          prerelease: false
-      # - name: "Upload release asset"
-      #   uses: actions/upload-release-asset@v1
-      #   env:
-      #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      #   with:
-      #     upload_url: "${{ steps.create_release.outputs.upload_url }}"
-      #     asset_path: ./*
-      #     asset_name: repository-template-${{ needs.metadata.outputs.version }}.tar.gz
-      #     asset_content_type: "application/gzip"
+      - name: "Output new release details"
+        if: steps.semantic.outputs.new_release_published == 'true'
+        run: |
+          echo ${{ steps.semantic.outputs.new_release_version }}
+          echo ${{ steps.semantic.outputs.new_release_major_version }}
+          echo ${{ steps.semantic.outputs.new_release_minor_version }}
+          echo ${{ steps.semantic.outputs.new_release_patch_version }}
+          export VERSION="${{ steps.semantic.outputs.new_release_version }}"
+          make list-variables
   success:
     name: "Success notification"
     runs-on: ubuntu-latest

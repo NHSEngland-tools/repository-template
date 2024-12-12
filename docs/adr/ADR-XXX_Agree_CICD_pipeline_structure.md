@@ -43,7 +43,6 @@ Requirements:
 - Implement good CI/CD practices, such as:
   - Setting the build time variables at the start of the process
   - Storing the tooling versions like Terraform, Python and Node.js in the `./.tools-version` file
-  - Storing the software/project version in the `./VERSION` file
   - Keeping the main workflow modular
   - Ensuring a timeout is set for each job
   - Listing environment variables

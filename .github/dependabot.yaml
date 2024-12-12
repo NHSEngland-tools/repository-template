@@ -6,23 +6,38 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+    commit-message:
+      # Prefix all commit messages with "chore: "
+      prefix: "chore"
 
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "daily"
+    commit-message:
+      # Prefix all commit messages with "chore: "
+      prefix: "chore"
 
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "daily"
+    commit-message:
+      # Prefix all commit messages with "chore: "
+      prefix: "chore"
 
   - package-ecosystem: "pip"
     directory: "/"
     schedule:
       interval: "daily"
+    commit-message:
+      # Prefix all commit messages with "chore: "
+      prefix: "chore"
 
   - package-ecosystem: "terraform"
     directory: "/"
     schedule:
       interval: "daily"
+    commit-message:
+      # Prefix all commit messages with "chore: "
+      prefix: "chore"

@@ -36,7 +36,7 @@ jobs:
           echo "python_version=$(grep "^nodejs" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
           echo "terraform_version=$(grep "^terraform" .tool-versions | cut -f2 -d' ')" >> $GITHUB_OUTPUT
           # TODO: Get the version, but it may not be the .version file as this should come from the CI/CD Pull Request Workflow
-          echo "version=$(head -n 1 .version 2> /dev/null || echo unknown)" >> $GITHUB_OUTPUT
+          echo "version=${{ github.event.ref }}" >> $GITHUB_OUTPUT
           echo "tag=${{ github.event.inputs.tag }}" >> $GITHUB_OUTPUT
       - name: "List variables"
         run: |
