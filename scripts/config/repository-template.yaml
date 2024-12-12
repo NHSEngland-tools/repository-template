@@ -1,1 +1,19 @@
 update-from-template:
+  modules: [ "terraform", "docker", "tests", "githooks", "reports", "config" ]
+  ignore:
+
+cicd-config:
+  stage:
+    build:
+      only-when-pr-present: true
+    acceptance:
+      only-when-pr-present: true
+
+version:
+  build-datetime: 2023-02-21T10:46:17+0000
+  template:
+    url: https://github.com/nhs-england-tools/repository-template
+    branch: main
+    commit-hash: 94834f9ecd87d96b6f43a6f0307f2e7ee905b1b4
+    tags: []
+    release-notes-url:
