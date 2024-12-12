@@ -11,7 +11,16 @@ dependencies: # Install dependencies needed to build and test the project @Pipel
 	# TODO: Implement installation of your project dependencies
 
 build: # Build the project artefact @Pipeline
-	# TODO: Implement the artefact build step
+	make _project name="build"
+
+up: # Run your code @Pipeline
+	make _project name="up"
+
+down: # Stop your code @Pipeline
+	make _project name="down"
+
+sh: up # Get a shell inside your running project, running it first if necessary @Development
+	make _project name="sh"
 
 publish: # Publish the project artefact @Pipeline
 	# TODO: Implement the artefact publishing step
@@ -28,9 +37,22 @@ config:: # Configure development environment (main) @Configuration
 
 # ==============================================================================
 
+_project:
+	set -e
+	SCRIPT="./scripts/projecthooks/${name}.sh"
+	if [ -e "$${SCRIPT}" ]; then
+		exec $$SCRIPT
+	else
+		echo "make ${name} not implemented: $${SCRIPT} not found" >&2
+	fi
+
 ${VERBOSE}.SILENT: \
+	_project \
 	build \
 	clean \
 	config \
 	dependencies \
 	deploy \
+	down \
+	sh \
+	up \
