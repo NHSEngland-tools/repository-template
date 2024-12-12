@@ -111,7 +111,7 @@ Most of the projects are built with customisability and extendability in mind. A
 
 Describe or link templates on how to raise an issue, feature request or make a contribution to the codebase. Reference the other documentation files, like
 
-- Environment setup for contribution, i.e. `CONTRIBUTING.md`
+- Environment setup for contribution, i.e. [CONTRIBUTING.md](./docs/CONTRIBUTING.md)
 - Coding standards, branching, linting, practices for development and testing
 - Release process, versioning, changelog
 - Backlog, board, roadmap, ways of working
